@@ -1,10 +1,13 @@
 import type { ExecutionContext } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import type { Reflector } from '@nestjs/core';
 import { describe, expect, it } from 'vitest';
 import type { TokenService } from '../../application/ports/token-service.js';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
 
-function httpContext(authorization?: string): { context: ExecutionContext; request: { headers: { authorization?: string }; user?: unknown } } {
+function httpContext(authorization?: string): {
+  context: ExecutionContext;
+  request: { headers: { authorization?: string }; user?: unknown };
+} {
   const request: { headers: { authorization?: string }; user?: unknown } = { headers: {} };
   if (authorization) request.headers.authorization = authorization;
   const context = {

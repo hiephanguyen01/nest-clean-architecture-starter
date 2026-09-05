@@ -27,8 +27,12 @@ class StubUsers {
 }
 
 class FakePasswordHasher implements PasswordHasher {
-  async hash(value: string): Promise<string> { return `hashed:${value}`; }
-  async verify(value: string, hash: string): Promise<boolean> { return hash === `hashed:${value}`; }
+  async hash(value: string): Promise<string> {
+    return `hashed:${value}`;
+  }
+  async verify(value: string, hash: string): Promise<boolean> {
+    return hash === `hashed:${value}`;
+  }
 }
 
 const fakeIssuer = {
@@ -50,9 +54,9 @@ describe('LoginUseCase', () => {
       fakeIssuer,
     );
 
-    await expect(useCase.execute({ email: 'missing@example.com', password: 'secret' })).rejects.toThrow(
-      InvalidCredentialsError,
-    );
+    await expect(
+      useCase.execute({ email: 'missing@example.com', password: 'secret' }),
+    ).rejects.toThrow(InvalidCredentialsError);
   });
 
   it('rejects a wrong password', async () => {
@@ -74,9 +78,9 @@ describe('LoginUseCase', () => {
       fakeIssuer,
     );
 
-    await expect(useCase.execute({ email: 'user@example.com', password: 'secret' })).rejects.toThrow(
-      AccountUnavailableError,
-    );
+    await expect(
+      useCase.execute({ email: 'user@example.com', password: 'secret' }),
+    ).rejects.toThrow(AccountUnavailableError);
   });
 
   it('returns a token pair for an active user with valid credentials', async () => {

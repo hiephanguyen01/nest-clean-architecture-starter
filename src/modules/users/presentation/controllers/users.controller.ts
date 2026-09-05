@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Param } from '@nestjs/common';
+import { Controller, Get, Inject, Param, ParseUUIDPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../../../shared/presentation/swagger/api-common-errors.decorator.js';
 import { Roles } from '../../../../shared/presentation/security/security-metadata.js';
@@ -17,7 +17,7 @@ export class UsersController {
   @Roles(UserRole.ADMIN)
   @ApiOkResponse({ type: UserEnvelopeDto })
   @ApiCommonErrors()
-  async getById(@Param('id') id: string): Promise<UserEnvelopeDto> {
+  async getById(@Param('id', ParseUUIDPipe) id: string): Promise<UserEnvelopeDto> {
     const user = await this.getUser.execute({ id });
     return { data: UserPresenter.present(user) };
   }

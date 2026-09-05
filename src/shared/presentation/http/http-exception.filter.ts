@@ -53,10 +53,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const code = getErrorCode(exception);
     const statusCode = getStatusCode(exception, code);
     const message = getSafeMessage(exception, statusCode);
+    const sanitizedCode = statusCode >= 500 ? 'INTERNAL_SERVER_ERROR' : code;
 
     const body: ErrorEnvelope = {
       statusCode,
-      code,
+      code: sanitizedCode,
       message,
       errors: exception instanceof ValidationFailureError ? exception.errors : [],
       timestamp: new Date().toISOString(),

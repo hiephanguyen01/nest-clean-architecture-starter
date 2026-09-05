@@ -14,7 +14,9 @@ export class PrismaRefreshSessionRepository extends RefreshSessionRepository {
   }
 
   async create(session: RefreshSession): Promise<void> {
-    await this.prisma.refreshSession.create({ data: RefreshSessionPrismaMapper.toPersistence(session) });
+    await this.prisma.refreshSession.create({
+      data: RefreshSessionPrismaMapper.toPersistence(session),
+    });
   }
 
   async findById(id: string): Promise<RefreshSession | null> {

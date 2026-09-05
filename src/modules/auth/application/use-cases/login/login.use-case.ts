@@ -17,6 +17,9 @@ export interface LoginOutput {
   tokens: AuthTokensOutput;
 }
 
+const DUMMY_PASSWORD_HASH =
+  '$argon2id$v=19$m=65536,t=3,p=4$45FELcyu423Q4HKPQGSmZQ$xyBBNyzcSqZS8BBF/gGfe2HX1t9imHK1nWPHkawLW9o';
+
 export class LoginUseCase {
   constructor(
     private readonly getUserAuthenticationData: GetUserAuthenticationDataUseCase,
@@ -30,6 +33,7 @@ export class LoginUseCase {
       user = await this.getUserAuthenticationData.execute({ email: input.email });
     } catch (error) {
       if (error instanceof UserNotFoundError) {
+        await this.passwordHasher.verify(input.password, DUMMY_PASSWORD_HASH);
         throw new InvalidCredentialsError();
       }
       throw error;

@@ -29,7 +29,8 @@ let prisma: PrismaService;
 beforeAll(async () => {
   const { AppModule } = await import('../../src/app.module.js');
   const { configureApp } = await import('../../src/bootstrap/configure-app.js');
-  const { PrismaService: PrismaServiceToken } = await import('../../src/infrastructure/database/prisma.service.js');
+  const { PrismaService: PrismaServiceToken } =
+    await import('../../src/infrastructure/database/prisma.service.js');
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
   app = moduleRef.createNestApplication<NestExpressApplication>();
   configureApp(app as NestExpressApplication);
@@ -60,7 +61,9 @@ describe('Auth API', () => {
     expect(registered.status).toBe(201);
     expect(registered.body.data.email).toBe('user@example.com');
     expect(registered.body.data.role).toBe('USER');
-    const persistedUser = await prisma.user.findUnique({ where: { id: registered.body.data.id as string } });
+    const persistedUser = await prisma.user.findUnique({
+      where: { id: registered.body.data.id as string },
+    });
     expect(persistedUser?.passwordHash).not.toBe('CorrectHorseBatteryStaple!');
 
     const loggedIn = await request(app.getHttpServer()).post('/auth/login').send({
@@ -88,19 +91,27 @@ describe('Auth API', () => {
     });
     const oldRefresh = loggedIn.body.data.tokens.refreshToken as string;
 
-    const refreshed = await request(app.getHttpServer()).post('/auth/refresh').send({ refreshToken: oldRefresh });
+    const refreshed = await request(app.getHttpServer())
+      .post('/auth/refresh')
+      .send({ refreshToken: oldRefresh });
     expect(refreshed.status).toBe(200);
     const rotatedRefresh = refreshed.body.data.refreshToken as string;
     expect(rotatedRefresh).not.toBe(oldRefresh);
 
-    const reused = await request(app.getHttpServer()).post('/auth/refresh').send({ refreshToken: oldRefresh });
+    const reused = await request(app.getHttpServer())
+      .post('/auth/refresh')
+      .send({ refreshToken: oldRefresh });
     expect(reused.status).toBe(401);
     expect(reused.body.code).toBe('INVALID_REFRESH_TOKEN');
 
-    const logout = await request(app.getHttpServer()).post('/auth/logout').send({ refreshToken: rotatedRefresh });
+    const logout = await request(app.getHttpServer())
+      .post('/auth/logout')
+      .send({ refreshToken: rotatedRefresh });
     expect(logout.status).toBe(200);
 
-    const afterLogout = await request(app.getHttpServer()).post('/auth/refresh').send({ refreshToken: rotatedRefresh });
+    const afterLogout = await request(app.getHttpServer())
+      .post('/auth/refresh')
+      .send({ refreshToken: rotatedRefresh });
     expect(afterLogout.status).toBe(401);
   });
 

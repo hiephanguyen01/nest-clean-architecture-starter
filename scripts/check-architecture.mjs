@@ -5,7 +5,10 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const srcRoot = join(root, 'src');
 const files = walk(srcRoot).filter(
-  (file) => file.endsWith('.ts') && !file.endsWith('.spec.ts') && !file.includes(`${join('src', 'generated')}`),
+  (file) =>
+    file.endsWith('.ts') &&
+    !file.endsWith('.spec.ts') &&
+    !file.includes(`${join('src', 'generated')}`),
 );
 const fileSet = new Set(files.map((file) => normalize(file)));
 const graph = new Map();
@@ -37,13 +40,22 @@ for (const file of files) {
     relativeDependencies.push(target);
     const normalizedTarget = target.replaceAll('\\', '/');
 
-    if (normalizedFile.includes('/domain/') && /\/(application|infrastructure|presentation)\//.test(normalizedTarget)) {
+    if (
+      normalizedFile.includes('/domain/') &&
+      /\/(application|infrastructure|presentation)\//.test(normalizedTarget)
+    ) {
       violations.push(`${display(file)}: Domain depends on outer layer ${display(target)}`);
     }
-    if (normalizedFile.includes('/application/') && /\/(infrastructure|presentation)\//.test(normalizedTarget)) {
+    if (
+      normalizedFile.includes('/application/') &&
+      /\/(infrastructure|presentation)\//.test(normalizedTarget)
+    ) {
       violations.push(`${display(file)}: Application depends on outer layer ${display(target)}`);
     }
-    if (normalizedFile.includes('/presentation/') && normalizedTarget.includes('/infrastructure/')) {
+    if (
+      normalizedFile.includes('/presentation/') &&
+      normalizedTarget.includes('/infrastructure/')
+    ) {
       violations.push(`${display(file)}: Presentation imports infrastructure ${display(target)}`);
     }
     if (normalizedFile.includes('/modules/users/') && normalizedTarget.includes('/modules/auth/')) {

@@ -4,6 +4,8 @@ import { randomUUID } from 'node:crypto';
 import { AppConfigService } from '../config/app-config.service.js';
 import { InfrastructureConfigModule } from '../config/infrastructure-config.module.js';
 
+const SAFE_REQUEST_ID_PATTERN = /^[a-zA-Z0-9_-]{1,128}$/;
+
 @Module({
   imports: [
     LoggerModule.forRootAsync({
@@ -46,7 +48,8 @@ import { InfrastructureConfigModule } from '../config/infrastructure-config.modu
             const header = req.headers['x-request-id'];
             const candidate = typeof header === 'string' ? header.trim() : '';
 
-            const requestId = candidate && candidate.length <= 128 ? candidate : randomUUID();
+            const requestId =
+              candidate && SAFE_REQUEST_ID_PATTERN.test(candidate) ? candidate : randomUUID();
 
             res.setHeader('x-request-id', requestId);
 

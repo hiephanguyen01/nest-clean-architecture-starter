@@ -51,10 +51,8 @@ import { RolesGuard } from './presentation/guards/roles.guard.js';
     },
     {
       provide: RegisterUseCase,
-      useFactory: (
-        passwordHasher: PasswordHasher,
-        createUser: CreateUserUseCase,
-      ) => new RegisterUseCase(passwordHasher, createUser),
+      useFactory: (passwordHasher: PasswordHasher, createUser: CreateUserUseCase) =>
+        new RegisterUseCase(passwordHasher, createUser),
       inject: [PasswordHasher, CreateUserUseCase],
     },
     {
@@ -76,7 +74,14 @@ import { RolesGuard } from './presentation/guards/roles.guard.js';
         ids: IdGenerator,
         clock: Clock,
       ) => new RefreshUseCase(tokens, refreshTokenHasher, sessions, getUser, ids, clock),
-      inject: [TokenService, RefreshTokenHasher, RefreshSessionRepository, GetUserUseCase, IdGenerator, Clock],
+      inject: [
+        TokenService,
+        RefreshTokenHasher,
+        RefreshSessionRepository,
+        GetUserUseCase,
+        IdGenerator,
+        Clock,
+      ],
     },
     {
       provide: LogoutUseCase,

@@ -1,6 +1,10 @@
 import type { UserOutput } from '../../../users/application/contracts/user-output.js';
 import type { AuthTokensOutput } from '../../application/services/token-pair-issuer.js';
-import type { AuthSessionResponseDto, AuthTokensResponseDto, AuthUserResponseDto } from '../dto/auth-response.dto.js';
+import type {
+  AuthSessionResponseDto,
+  AuthTokensResponseDto,
+  AuthUserResponseDto,
+} from '../dto/auth-response.dto.js';
 
 export class AuthPresenter {
   static user(user: UserOutput): AuthUserResponseDto {

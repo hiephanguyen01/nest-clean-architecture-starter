@@ -50,10 +50,16 @@ describe('PrismaUserRepository', () => {
         now,
       });
 
-    const results = await Promise.allSettled([repository.save(makeUser()), repository.save(makeUser())]);
+    const results = await Promise.allSettled([
+      repository.save(makeUser()),
+      repository.save(makeUser()),
+    ]);
 
     expect(results.filter((result) => result.status === 'fulfilled')).toHaveLength(1);
     const rejection = results.find((result) => result.status === 'rejected');
-    expect(rejection).toMatchObject({ status: 'rejected', reason: expect.any(EmailAlreadyExistsError) });
+    expect(rejection).toMatchObject({
+      status: 'rejected',
+      reason: expect.any(EmailAlreadyExistsError),
+    });
   });
 });

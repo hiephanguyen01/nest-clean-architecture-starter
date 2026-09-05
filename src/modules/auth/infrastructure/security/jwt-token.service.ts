@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { jwtVerify, SignJWT } from 'jose';
 import { AppConfigService } from '../../../../infrastructure/config/app-config.service.js';
+import { Clock } from '../../../../shared/application/ports/clock.js';
 import {
   TokenService,
   type AccessTokenClaims,
@@ -13,10 +14,13 @@ import {
 export class JwtTokenService implements TokenService {
   private readonly encoder = new TextEncoder();
 
-  constructor(@Inject(AppConfigService) private readonly config: AppConfigService) {}
+  constructor(
+    @Inject(AppConfigService) private readonly config: AppConfigService,
+    @Inject(Clock) private readonly clock: Clock,
+  ) {}
 
   async issueAccessToken(input: { userId: string; role: string }): Promise<IssuedToken> {
-    const issuedAt = Math.floor(Date.now() / 1000);
+    const issuedAt = Math.floor(this.clock.now().getTime() / 1000);
     const expiresAtSeconds = issuedAt + this.config.jwtAccessExpiresInSeconds;
     const token = await new SignJWT({ role: input.role, tokenType: 'access' })
       .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
@@ -31,7 +35,7 @@ export class JwtTokenService implements TokenService {
   }
 
   async issueRefreshToken(input: { userId: string; sessionId: string }): Promise<IssuedToken> {
-    const issuedAt = Math.floor(Date.now() / 1000);
+    const issuedAt = Math.floor(this.clock.now().getTime() / 1000);
     const expiresAtSeconds = issuedAt + this.config.jwtRefreshExpiresInSeconds;
     const token = await new SignJWT({ sid: input.sessionId, tokenType: 'refresh' })
       .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
@@ -51,7 +55,11 @@ export class JwtTokenService implements TokenService {
       audience: this.config.jwtAudience,
       algorithms: ['HS256'],
     });
-    if (payload.tokenType !== 'access' || typeof payload.sub !== 'string' || typeof payload.role !== 'string') {
+    if (
+      payload.tokenType !== 'access' ||
+      typeof payload.sub !== 'string' ||
+      typeof payload.role !== 'string'
+    ) {
       throw new Error('Invalid access token claims');
     }
     return { userId: payload.sub, role: payload.role };
@@ -63,7 +71,11 @@ export class JwtTokenService implements TokenService {
       audience: this.config.jwtAudience,
       algorithms: ['HS256'],
     });
-    if (payload.tokenType !== 'refresh' || typeof payload.sub !== 'string' || typeof payload.sid !== 'string') {
+    if (
+      payload.tokenType !== 'refresh' ||
+      typeof payload.sub !== 'string' ||
+      typeof payload.sid !== 'string'
+    ) {
       throw new Error('Invalid refresh token claims');
     }
     return { userId: payload.sub, sessionId: payload.sid };

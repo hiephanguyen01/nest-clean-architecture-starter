@@ -22,9 +22,9 @@ describe('validateEnv', () => {
   });
 
   it('rejects reused JWT or refresh-token hashing secrets', () => {
-    expect(() =>
-      validateEnv({ ...valid, JWT_REFRESH_SECRET: valid.JWT_ACCESS_SECRET }),
-    ).toThrow(/must be different/);
+    expect(() => validateEnv({ ...valid, JWT_REFRESH_SECRET: valid.JWT_ACCESS_SECRET })).toThrow(
+      /must be different/,
+    );
 
     expect(() =>
       validateEnv({ ...valid, REFRESH_TOKEN_HASH_SECRET: valid.JWT_REFRESH_SECRET }),

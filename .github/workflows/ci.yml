@@ -28,7 +28,7 @@ jobs:
       JWT_ACCESS_SECRET: ci-access-secret-that-is-at-least-32-characters
       JWT_REFRESH_SECRET: ci-refresh-secret-that-is-at-least-32-characters
       REFRESH_TOKEN_HASH_SECRET: ci-refresh-hash-secret-at-least-32-characters
-      SWAGGER_ENABLED: "false"
+      SWAGGER_ENABLED: 'false'
       LOG_LEVEL: silent
       CORS_ORIGINS: http://localhost:3000
 

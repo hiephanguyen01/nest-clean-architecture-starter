@@ -7,8 +7,12 @@ import { WeakPasswordError } from '../../errors/weak-password.error.js';
 import { RegisterUseCase } from './register.use-case.js';
 
 class FakePasswordHasher implements PasswordHasher {
-  async hash(value: string): Promise<string> { return `hashed:${value}`; }
-  async verify(_value: string, _hash: string): Promise<boolean> { return false; }
+  async hash(value: string): Promise<string> {
+    return `hashed:${value}`;
+  }
+  async verify(_value: string, _hash: string): Promise<boolean> {
+    return false;
+  }
 }
 
 class CapturingCreateUser {

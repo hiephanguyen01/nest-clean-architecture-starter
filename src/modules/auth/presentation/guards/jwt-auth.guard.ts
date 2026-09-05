@@ -1,4 +1,10 @@
-import { Inject, Injectable, UnauthorizedException, type CanActivate, type ExecutionContext } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  UnauthorizedException,
+  type CanActivate,
+  type ExecutionContext,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../../../../shared/presentation/security/security-metadata.js';
 import type { RequestPrincipal } from '../../../../shared/presentation/security/request-principal.js';

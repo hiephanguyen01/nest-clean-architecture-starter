@@ -1,6 +1,6 @@
 import { InvalidUserNameError } from '../errors/invalid-user-name.error.js';
-import { UserRole } from '../enums/user-role.enum.js';
-import { UserStatus } from '../enums/user-status.enum.js';
+import type { UserRole } from '../enums/user-role.enum.js';
+import type { UserStatus } from '../enums/user-status.enum.js';
 import type { Email } from '../value-objects/email.vo.js';
 import type { UserId } from '../value-objects/user-id.vo.js';
 

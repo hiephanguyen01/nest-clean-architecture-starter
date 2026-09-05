@@ -9,7 +9,7 @@ describe('Email', () => {
     expect(email.value).toBe('test.user@example.com');
   });
 
-  it.each(['', 'plain-text', '@example.com', 'user@', 'user @example.com']) (
+  it.each(['', 'plain-text', '@example.com', 'user@', 'user @example.com'])(
     'rejects invalid email %j',
     (value) => {
       expect(() => Email.create(value)).toThrow(InvalidEmailError);

@@ -7,7 +7,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      include: ['src/modules/**/domain/**/*.ts', 'src/modules/**/application/**/*.ts']
-    }
-  }
+      include: ['src/modules/**/domain/**/*.ts', 'src/modules/**/application/**/*.ts'],
+    },
+  },
 });
