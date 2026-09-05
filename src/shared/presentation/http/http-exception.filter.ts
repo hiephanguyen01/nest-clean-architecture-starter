@@ -1,6 +1,10 @@
 import { Catch, HttpException, type ArgumentsHost, type ExceptionFilter } from '@nestjs/common';
-import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
-import { ValidationFailureError, type ValidationErrorDetail } from '../errors/validation-failure.error.js';
+import { PinoLogger } from 'nestjs-pino';
+
+import {
+  ValidationFailureError,
+  type ValidationErrorDetail,
+} from '../errors/validation-failure.error.js';
 
 const STATUS_BY_CODE: Readonly<Record<string, number>> = {
   VALIDATION_ERROR: 400,
@@ -37,17 +41,19 @@ interface HttpResponseLike {
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  constructor(
-    @InjectPinoLogger(HttpExceptionFilter.name) private readonly logger: PinoLogger,
-  ) {}
+  constructor(private readonly logger: PinoLogger) {
+    this.logger.setContext(HttpExceptionFilter.name);
+  }
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<HttpRequestLike>();
     const response = ctx.getResponse<HttpResponseLike>();
+
     const code = getErrorCode(exception);
     const statusCode = getStatusCode(exception, code);
     const message = getSafeMessage(exception, statusCode);
+
     const body: ErrorEnvelope = {
       statusCode,
       code,
@@ -60,7 +66,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (statusCode >= 500) {
       const error = exception instanceof Error ? exception : new Error(String(exception));
-      this.logger.error({ err: error, requestId: request.id, path: request.url }, 'Unhandled request error');
+
+      this.logger.error(
+        {
+          err: error,
+          requestId: request.id,
+          path: request.url,
+        },
+        'Unhandled request error',
+      );
     }
 
     response.status(statusCode).json(body);
@@ -70,36 +84,62 @@ export class HttpExceptionFilter implements ExceptionFilter {
 function getErrorCode(exception: unknown): string {
   if (exception && typeof exception === 'object' && 'code' in exception) {
     const code = (exception as { code?: unknown }).code;
-    if (typeof code === 'string') return code;
+
+    if (typeof code === 'string') {
+      return code;
+    }
   }
+
   if (exception instanceof HttpException) {
     return statusToCode(exception.getStatus());
   }
+
   return 'INTERNAL_SERVER_ERROR';
 }
 
 function getStatusCode(exception: unknown, code: string): number {
   const mapped = STATUS_BY_CODE[code];
-  if (mapped) return mapped;
-  if (exception instanceof HttpException) return exception.getStatus();
+
+  if (mapped) {
+    return mapped;
+  }
+
+  if (exception instanceof HttpException) {
+    return exception.getStatus();
+  }
+
   return 500;
 }
 
 function getSafeMessage(exception: unknown, statusCode: number): string {
-  if (statusCode >= 500) return 'Internal server error';
-  if (exception instanceof Error) return exception.message;
+  if (statusCode >= 500) {
+    return 'Internal server error';
+  }
+
+  if (exception instanceof Error) {
+    return exception.message;
+  }
+
   return 'Request failed';
 }
 
 function statusToCode(status: number): string {
   switch (status) {
-    case 400: return 'BAD_REQUEST';
-    case 401: return 'UNAUTHORIZED';
-    case 403: return 'FORBIDDEN';
-    case 404: return 'NOT_FOUND';
-    case 409: return 'CONFLICT';
-    case 429: return 'RATE_LIMIT_EXCEEDED';
-    case 503: return 'SERVICE_UNAVAILABLE';
-    default: return 'HTTP_ERROR';
+    case 400:
+      return 'BAD_REQUEST';
+    case 401:
+      return 'UNAUTHORIZED';
+    case 403:
+      return 'FORBIDDEN';
+    case 404:
+      return 'NOT_FOUND';
+    case 409:
+      return 'CONFLICT';
+    case 429:
+      return 'RATE_LIMIT_EXCEEDED';
+    case 503:
+      return 'SERVICE_UNAVAILABLE';
+    default:
+      return 'HTTP_ERROR';
   }
 }

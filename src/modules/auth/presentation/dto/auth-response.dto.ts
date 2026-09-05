@@ -35,5 +35,10 @@ export class AuthUserEnvelopeDto {
 }
 
 export class EmptySuccessEnvelopeDto {
-  @ApiProperty({ nullable: true, example: null }) data!: null;
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    example: null,
+  })
+  data!: null;
 }
