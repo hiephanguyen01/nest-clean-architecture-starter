@@ -1,0 +1,80 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: ci-password
+          POSTGRES_DB: app_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app -d app_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://app:ci-password@localhost:5432/app_test?schema=public
+      TEST_DATABASE_URL: postgresql://app:ci-password@localhost:5432/app_test?schema=public
+      NODE_ENV: test
+      JWT_ACCESS_SECRET: ci-access-secret-that-is-at-least-32-characters
+      JWT_REFRESH_SECRET: ci-refresh-secret-that-is-at-least-32-characters
+      REFRESH_TOKEN_HASH_SECRET: ci-refresh-hash-secret-at-least-32-characters
+      SWAGGER_ENABLED: "false"
+      LOG_LEVEL: silent
+      CORS_ORIGINS: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Generate Prisma client
+        run: npm run prisma:generate
+
+      - name: Apply test migrations
+        run: npm run prisma:migrate:deploy
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Architecture
+        run: npm run architecture:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Integration tests
+        run: npm run test:integration
+
+      - name: E2E tests
+        run: npm run test:e2e
+
+      - name: Coverage
+        run: npm run test:cov
+
+      - name: Docker build
+        run: docker build -t nest-clean-architecture-starter:ci .
