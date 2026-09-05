@@ -1,10 +1,10 @@
 import { Inject, Injectable, type CanActivate, type ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import type { RequestPrincipal } from '../../../../shared/presentation/security/request-principal.js';
 import {
   IS_PUBLIC_KEY,
   ROLES_KEY,
 } from '../../../../shared/presentation/security/security-metadata.js';
-import type { RequestPrincipal } from '../../../../shared/presentation/security/request-principal.js';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
